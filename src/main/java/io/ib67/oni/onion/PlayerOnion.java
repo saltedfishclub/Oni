@@ -1,14 +1,12 @@
 package io.ib67.oni.onion;
 
 import io.ib67.oni.Oni;
-import io.ib67.oni.mock.OniPlayer;
 import io.ib67.oni.util.text.TextUtil;
+import io.ib67.oni.mock.OniPlayer;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import javax.xml.validation.Validator;
 import java.util.*;
 
 public final class PlayerOnion extends OniPlayer{

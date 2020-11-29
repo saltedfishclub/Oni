@@ -1,0 +1,3 @@
+name: Oni
+main: io.ib67.oni.OniLoader
+version: @version@

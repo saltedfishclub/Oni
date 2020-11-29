@@ -1,0 +1,15 @@
+plugins {
+    id 'java'
+}
+
+group 'io.ib67.oni'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    implementation 'com.github.mikroskeem:PicoMaven:0.0.2'
+}
