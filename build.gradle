@@ -5,22 +5,24 @@ plugins {
 }
 
 group 'io.ib67.oni'
-String version= '1.0-SNAPSHOT'
+version= '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-}
 
+}
+allprojects{
+    repositories{
+        maven {
+            name = 'spigotmc-repo'
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        }
+    }
+}
 dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
+    compileOnly 'org.jetbrains:annotations:20.1.0'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
     testCompile group: 'junit', name: 'junit', version: '4.12'
-}
-task buildOni {
-    replaceText(new File("${project.rootDir}/src/main/java/io/ib67/oni/Oni.java"),"VERSION",version)
-}
-shadowJar.dependsOn(buildOni)
-def static replaceText(File file, String key, String value) {
-    def fileText = file.text
-    def regex = '@' + key + '@'
-    fileText = (fileText =~ /${regex}/).replaceAll(value)
-    file.write(fileText)
 }
