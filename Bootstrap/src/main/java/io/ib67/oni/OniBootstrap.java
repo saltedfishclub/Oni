@@ -2,6 +2,7 @@ package io.ib67.oni;
 
 import com.google.gson.Gson;
 import io.ib67.oni.maven.config.OniSetting;
+import io.ib67.oni.plugin.OniPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +16,13 @@ import java.nio.file.Path;
 public final class OniBootstrap extends JavaPlugin {
     private static final Gson gson=new Gson();
     private Oni oniCore;
+    private OniPlugin plugin;
+
+    @Override
+    public void onDisable() {
+        plugin.onDisable();
+    }
+
     @Override
     public void onEnable(){
         // resolve dependencies
@@ -57,5 +65,16 @@ public final class OniBootstrap extends JavaPlugin {
         //Oni load successfully
         oniCore=Oni.of(this);
         oniCore.getDependencyManager().download(oniSetting,c->{});
+        try{
+            plugin=(OniPlugin) Class.forName(oniSetting.pluginMainClass).newInstance();
+            plugin.onEnable(oniCore);
+        }catch(ClassNotFoundException cnf){
+            cnf.printStackTrace();
+            this.setEnabled(false);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
     }
 }
