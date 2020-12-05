@@ -1,58 +1,56 @@
 package io.ib67.oni;
 
-import eu.mikroskeem.picomaven.Dependency;
-import eu.mikroskeem.picomaven.PicoMaven;
-import io.ib67.oni.maven.config.OniSetting;
+import com.sun.xml.internal.ws.util.StringUtils;
+import io.ib67.oni.maven.config.Dependency;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class MavenDownloader {
     public static final List<URI> DEFAULT_REPOSITORIES;
-
+    private final List<URI> repositories;
     static {
             DEFAULT_REPOSITORIES = Arrays.asList(
                     URI.create("https://maven.hbxueli.com/repository/maven-public/"),
+                    URI.create("https://jitpack.io/"),
                     URI.create("https://maven.aliyun.com/nexus/content/groups/public/"),
-                    URI.create("https://repo.maven.apache.org/maven2"),
-                    URI.create("https://jitpack.io")
+                    URI.create("https://repo.maven.apache.org/maven2/")
             );
     }
-
-    public void download(OniSetting setting, File destin, Consumer<List<Path>> callback){
-        destin.getParentFile().mkdirs();
-        destin.mkdirs();
-        List<URI> repos=new LinkedList<>();
-        repos.addAll(setting.repositories);
-        repos.addAll(DEFAULT_REPOSITORIES);
-        PicoMaven.Builder picoMavenBase = new PicoMaven.Builder()
-                .withDownloadPath(destin.toPath())
-                .withRepositories(repos)
-                .withDependencies(setting.dependencies);
-        try (PicoMaven picoMaven = picoMavenBase.build()) {
-            List<Path> downloaded = picoMaven.downloadAll();
-            callback.accept(downloaded);
-        }catch(InterruptedException e){
-            e.printStackTrace();
-        }
-        callback.accept(new ArrayList<>());
+    public MavenDownloader(List<URI> extraRepositories){
+        repositories=DEFAULT_REPOSITORIES;
+        if(extraRepositories!=null) repositories.addAll(extraRepositories);
     }
-    public static Path downloadOni(String version) throws InterruptedException {
-        Path destination=Paths.get(".","lib");
-        PicoMaven.Builder picoMavenBase = new PicoMaven.Builder()
-                .withDownloadPath(destination)
-                .withRepositories(DEFAULT_REPOSITORIES)
-                .withDependencies(Arrays.asList(new Dependency("io.ib67.oni","Oni",version)));
-        return picoMavenBase.build().downloadAll().get(0);
+    public boolean downloadArtifact(Dependency depend){
+        File targetDir=new File("./lib/"+depend.artifactId+"-"+depend.version+".jar");
+        targetDir.getParentFile().mkdirs();
+        return downloadArtifact(depend,targetDir);
+    }
+    public boolean downloadArtifact(Dependency depend,File file){
+        boolean succeed=false;
+        if(depend.boundedRepositories!=null){
+            try{
+                FileUtils.copyURLToFile(URI.create(depend.boundedRepositories+depend.asArtifactUrlPart()).toURL(),file);
+                return true;
+            }catch(IOException e){
+                e.printStackTrace();
+                System.err.println("Failed to load "+depend.boundedRepositories+depend.asArtifactUrlPart());
+                return false;
+            }
+        }
+        for(URI uri:repositories) {
+            try {
+                succeed=true;
+                FileUtils.copyURLToFile(new URL(uri.toString()+depend.asArtifactUrlPart()), file);
+            } catch (IOException ignored) {
+                succeed=false;
+            }
+        }
+        return succeed;
     }
 }
