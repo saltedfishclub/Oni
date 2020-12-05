@@ -1,15 +1,14 @@
 package io.ib67.oni;
 
-import com.sun.xml.internal.ws.util.StringUtils;
 import io.ib67.oni.maven.config.Dependency;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class MavenDownloader {
     public static final List<URI> DEFAULT_REPOSITORIES;
@@ -39,7 +38,7 @@ public class MavenDownloader {
                 return true;
             }catch(IOException e){
                 e.printStackTrace();
-                System.err.println("Failed to load "+depend.boundedRepositories+depend.asArtifactUrlPart());
+                System.err.println("Failed to download " + depend.boundedRepositories + depend.asArtifactUrlPart());
                 return false;
             }
         }

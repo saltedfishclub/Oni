@@ -5,15 +5,11 @@ import io.ib67.oni.config.OniSetting;
 import io.ib67.oni.maven.config.Dependency;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.xml.validation.Validator;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.net.URL;
-import java.nio.file.Path;
 
 /**
  * Oni plugin bootstrap entrance.
@@ -43,14 +39,12 @@ public abstract class OniModule extends JavaPlugin {
         // resolve dependencies
         Reader settingReader = getTextResource("oni.setting.json");
         if (settingReader == null) {
-            Bukkit.getServer().getScheduler().runTask(this, () -> {
                 getLogger().warning("CANT LOAD ONI-SETTING!");
                 getLogger().warning("* IF YOU ARE END-USER,PLEASE FEEDBACK THIS MESSAGE TO DEVELOPER.");
                 getLogger().warning("* IF YOU ARE DEVELOPER,PLEASE CHECK GRADLE BUILD SETTINGS");
                 getLogger().warning("PLUGIN IS DISABLING");
                 this.setEnabled(false);
-            });
-            return;
+                return;
         }
         OniSetting oniSetting = gson.fromJson(settingReader, OniSetting.class);
         downloader=new MavenDownloader(oniSetting.additionalRepos);
@@ -59,20 +53,25 @@ public abstract class OniModule extends JavaPlugin {
         } catch (IOException ignored) {
 
         }
-        if (!loadOni(false,oniSetting)) {
+        if (!loadOni(false, oniSetting)) {
             this.setEnabled(true);
             getLogger().warning("Failed to load OniCore,Plugin shutting down.");
             return;
         }
         //Resolve other deps
-        oniSetting.dependencies.forEach(e->{
-            File targetDir=new File("./lib/"+e.artifactId+"-"+e.version+".jar");
-            getLogger().info("Resolving Dependency: "+e.artifactId+"-"+e.version);
-            downloader.downloadArtifact(e,targetDir);
+        for (Dependency e : oniSetting.dependencies) {
+            File targetDir = new File("./lib/" + e.artifactId + "-" + e.version + ".jar");
+            getLogger().info("Resolving Dependency: " + e.artifactId + "-" + e.version);
+            if (!downloader.downloadArtifact(e, targetDir)) {
+                getLogger().info("FAILED TO DOWNLOAD!");
+                this.setEnabled(false);
+                return;
+            }
             try {
                 Oni.loadIntoClassloader(Oni.class.getClassLoader(), targetDir.toURI().toURL());
-            }catch(Throwable ignored){}
-        });
+            } catch (Throwable ignored) {
+            }
+        }
         getLogger().info("Plugin loaded.");
     }
 
