@@ -1,4 +1,5 @@
 rootProject.name = 'Oni'
 include 'Bootstrap'
 include 'MavenDownloader'
+include 'gradle-plugin'
 

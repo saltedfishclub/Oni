@@ -1,5 +1,6 @@
 plugins {
     id "java"
+    id 'maven'
 }
 
 group 'io.ib67.oni'
@@ -15,7 +16,6 @@ repositories {
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
 }
-
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: '4.12'
