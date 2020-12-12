@@ -17,6 +17,7 @@ public class MavenDownloader {
     private final List<URI> repositories;
     static {
             DEFAULT_REPOSITORIES = Arrays.asList(
+                    URI.create("https://repo.sfclub.cc/snapshots"),
                     URI.create("https://maven.hbxueli.com/repository/jitpack-proxy/"),
                     URI.create("https://jitpack.io/"),
                     URI.create("https://maven.aliyun.com/nexus/content/groups/public/"),

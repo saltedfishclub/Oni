@@ -1,6 +1,6 @@
 package io.ib67.oni.mock;
 
-import io.ib67.oni.player.PlayerOfflineException;
+import io.ib67.oni.exception.player.PlayerOfflineException;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.bukkit.*;
@@ -1790,7 +1790,6 @@ public abstract class OniPlayer implements Player {
         return getRealPlayer().launchProjectile(projectile, velocity);
     }
 
-    @Override
     public String toString() {
         return cachedName+" ("+player.toString()+")";
     }
