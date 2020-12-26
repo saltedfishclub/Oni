@@ -10,6 +10,6 @@ public class Dependency {
     public boolean optional = false;
     public String boundedRepositories;
     public String asArtifactUrlPart(){
-        return groupId+"/"+artifactId+"/"+version+"/"+artifactId+"-"+version+".jar";
+        return groupId.replaceAll("\\.", "/") + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version + ".jar";
     }
 }
