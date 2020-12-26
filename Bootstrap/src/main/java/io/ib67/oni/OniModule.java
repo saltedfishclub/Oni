@@ -49,7 +49,7 @@ public abstract class OniModule extends JavaPlugin {
             // Class found!
             String[] versions = oniSetting.oniVersion.split("-");
             if (versions.length < 2) {
-                getLogger().warning("Illegal oni versions,Please contact plugin author.");
+                getLogger().warning("Illegal oni version,Please contact plugin author.");
                 return;
             }
             if (Integer.parseInt(versions[0]) > Oni.VERSION) {
@@ -79,8 +79,11 @@ public abstract class OniModule extends JavaPlugin {
         onStart();
     }
 
-    @Deprecated
-    public abstract void beforeEnable();
+    /**
+     * DO you really know what are you doing?
+     */
+    public void beforeEnable() {
+    }
 
     public abstract void onStart();
 

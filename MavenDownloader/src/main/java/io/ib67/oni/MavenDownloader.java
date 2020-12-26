@@ -18,6 +18,7 @@ public class MavenDownloader {
     static {
             DEFAULT_REPOSITORIES = Arrays.asList(
                     URI.create("https://repo.sfclub.cc/snapshots"),
+                    URI.create("https://maven.hbxueli.com/repository/maven-releases/"),
                     URI.create("https://maven.hbxueli.com/repository/jitpack-proxy/"),
                     URI.create("https://jitpack.io/"),
                     URI.create("https://maven.aliyun.com/nexus/content/groups/public/"),
@@ -47,7 +48,7 @@ public class MavenDownloader {
     }
 
     public Result downloadArtifact(Dependency depend, File file) {
-        System.out.println("Downloading " + depend.artifactId + " v" + depend.version); //todo 进度条
+        System.out.println("Downloading " + depend.artifactId + " v" + depend.version);
         boolean succeed = false;
         if (depend.boundedRepositories != null) {
             try {
