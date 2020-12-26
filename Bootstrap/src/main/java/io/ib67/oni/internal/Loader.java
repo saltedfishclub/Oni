@@ -1,4 +1,4 @@
-package io.ib67.oni;
+package io.ib67.oni.internal;
 
 import sun.misc.Unsafe;
 

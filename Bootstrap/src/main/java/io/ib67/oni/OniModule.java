@@ -1,7 +1,8 @@
 package io.ib67.oni;
 
 import com.google.gson.Gson;
-import io.ib67.oni.config.OniSetting;
+import io.ib67.oni.internal.Loader;
+import io.ib67.oni.internal.OniSetting;
 import io.ib67.oni.maven.Result;
 import io.ib67.oni.maven.config.Dependency;
 import org.apache.commons.lang.Validate;

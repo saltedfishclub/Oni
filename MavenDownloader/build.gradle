@@ -1,9 +1,11 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
 group 'io.ib67.oni'
-version '1.0-SNAPSHOT'
+def ver='1.0-SNAPSHOT'
+version ver
 
 repositories {
     mavenCentral()
@@ -15,4 +17,34 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compileOnly group: 'commons-io', name: 'commons-io', version: '2.8.0'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+}
+Properties localConf = new Properties()
+localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
+publishing{
+    publications{
+        artifact(MavenPublication) {
+            groupId = "io.ib67.oni"
+            artifactId = "MavenDownloader"
+            version = ver
+
+            from components.java
+        }
+    }
+    repositories{
+        maven {
+            url = "/tmp/repo"
+            name = "TmpLocal"
+        }
+        maven {
+            def baseUrl="https://repo.sfclub.cc"
+            def releasesRepoUrl = "$baseUrl/releases"
+            def snapshotsRepoUrl = "$baseUrl/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            name = "SFOfficial"
+            credentials {
+                username = localConf.getProperty("SF_REPO_ALIAS")
+                password = localConf.getProperty("SF_REPO_TOKEN")
+            }
+        }
+    }
 }

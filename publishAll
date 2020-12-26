@@ -1,0 +1,1 @@
+./gradlew :MavenDownloader:publish :BootStrap:publish publish

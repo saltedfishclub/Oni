@@ -1,4 +1,4 @@
-package io.ib67.oni.config;
+package io.ib67.oni.internal;
 
 import io.ib67.oni.maven.config.Dependency;
 

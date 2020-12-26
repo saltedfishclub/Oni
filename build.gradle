@@ -1,12 +1,14 @@
 import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id "java"
     id 'com.github.johnrengelman.shadow' version "6.0.0"
+    id "maven-publish"
 }
 
 group 'io.ib67.oni'
-version= '1-1.0-SNAPSHOT'
-
+def ver = '1-1.0'
+version = ver
 repositories {
     mavenCentral()
     maven {
@@ -18,13 +20,14 @@ repositories {
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
 }
-allprojects{
-    repositories{
-        maven{ url = "https://jitpack.io"}
+allprojects {
+    repositories {
+        maven { url = "https://jitpack.io" }
     }
+
 }
-subprojects{
-        apply plugin: 'com.github.johnrengelman.shadow'
+subprojects {
+    apply plugin: 'com.github.johnrengelman.shadow'
 }
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
@@ -34,7 +37,36 @@ dependencies {
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
-task(install) .dependsOn(shadowJar)
+Properties localConf = new Properties()
+localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
+publishing {
+    publications {
+        artifact(MavenPublication) {
+            groupId = "io.ib67.oni"
+            artifactId = "Oni"
+            version = ver
+
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url = "/tmp/repo"
+            name = "TmpLocal"
+        }
+        maven {
+            def baseUrl = "https://repo.sfclub.cc"
+            def releasesRepoUrl = "$baseUrl/releases"
+            def snapshotsRepoUrl = "$baseUrl/snapshots"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            name = "SFOfficial"
+            credentials {
+                username = localConf.getProperty("SF_REPO_ALIAS")
+                password = localConf.getProperty("SF_REPO_TOKEN")
+            }
+        }
+    }
+}
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         filter ReplaceTokens, tokens: [version: version]
