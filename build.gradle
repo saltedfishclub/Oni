@@ -35,7 +35,7 @@ subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
 }
 dependencies {
-    compileOnly 'org.spigotmc:spigot:1.13.2-R0.1-20191113.201242-53'
+    compileOnly 'org.spigotmc:spigot:1.14.4-R0.1-20191224.232152-15'
     compileOnly 'org.jetbrains:annotations:20.1.0'
     compile project(":MavenDownloader")
     compile group: 'com.github.kevinsawicki', name: 'http-request', version: '6.0'
