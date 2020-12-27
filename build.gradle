@@ -24,6 +24,8 @@ repositories {
     }
 }
 allprojects {
+    targetCompatibility = 1.8
+    sourceCompatibility = 1.8
     repositories {
         maven { url = "https://jitpack.io" }
     }
