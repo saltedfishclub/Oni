@@ -1,4 +1,4 @@
-package io.ib67.oni.mock;
+package io.ib67.oni.internal.mock;
 
 import io.ib67.oni.exception.player.PlayerOfflineException;
 import lombok.NonNull;
@@ -32,54 +32,95 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.util.*;
 
+/**
+ * A abstract class which implemens BukkitPlayer.
+ * Provide chance to extra player.
+ * Has its own offline check, Don't leak out or cause some compatibility issues..
+ *
+ * @since 1.0
+ */
 @SuppressWarnings("all")
+@ApiStatus.Internal
 public abstract class OniPlayer implements Player {
     private final UUID player;
     private final String cachedName;
     private WeakReference<Player> playerRefs;
-    protected OniPlayer(UUID player){
-        this.player=player;
-        this.cachedName= getRealPlayer().getName();
+
+    protected OniPlayer(UUID player) {
+        this.player = player;
+        this.cachedName = getRealPlayer().getName();
     }
+
+    /**
+     * Is it offline?
+     *
+     * @return offline status
+     * @since 1.0
+     */
     public boolean isOffline() {
         return getRealPlayerWithoutCheck() == null;
     }
+
+    /**
+     * Get the unwrapped player without offline check.
+     *
+     * @return player
+     * @since 1.0
+     */
     @Nullable
-    public Player getRealPlayerWithoutCheck(){
-        boolean checked=false;
-        if(playerRefs==null){
-            playerRefs=new WeakReference<>(Bukkit.getPlayer(this.player));
-            checked=true;
+    public Player getRealPlayerWithoutCheck() {
+        boolean checked = false;
+        if (playerRefs == null) {
+            playerRefs = new WeakReference<>(Bukkit.getPlayer(this.player));
+            checked = true;
         }
-        Player player=playerRefs.get();
-        if(player==null && !checked){
-            playerRefs=new WeakReference<>(Bukkit.getPlayer(this.player));
+        Player player = playerRefs.get();
+        if (player == null && !checked) {
+            playerRefs = new WeakReference<>(Bukkit.getPlayer(this.player));
         }
         return player;
     }
+
+    /**
+     * Get the unwrapped player with offline check
+     *
+     * @return player
+     * @throws PlayerOfflineException
+     * @since 1.0
+     */
     @NonNull
-    public Player getRealPlayer(){
-        if(isOffline()){
+    public Player getRealPlayer() {
+        if (isOffline()) {
             throwOfflineException();
         }
         return getRealPlayer();
     }
+
+    /**
+     * As a offline player
+     *
+     * @return offline version
+     * @since 1.0
+     */
     @NonNull
-    public OfflinePlayer asOfflinePlayer(){
+    public OfflinePlayer asOfflinePlayer() {
         return Bukkit.getOfflinePlayer(player);
     }
+
     @SneakyThrows
-    private void throwOfflineException(){
-        throw new PlayerOfflineException(this.toString()+"is offline!");
+    private void throwOfflineException() {
+        throw new PlayerOfflineException(this.toString() + "is offline!");
     }
+
     @Override
-    public String getDisplayName(){
+    public String getDisplayName() {
         return getRealPlayer().getDisplayName();
     }
 
@@ -95,133 +136,133 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void setPlayerListName(String name) {
-        
+
         getRealPlayer().setPlayerListName(name);
     }
 
     @Override
     public String getPlayerListHeader() {
-        
+
         return getRealPlayer().getPlayerListHeader();
     }
 
     @Override
     public String getPlayerListFooter() {
-        
+
         return getRealPlayer().getPlayerListFooter();
     }
 
     @Override
     public void setPlayerListHeader(String header) {
-        
+
         getRealPlayer().setPlayerListHeader(header);
     }
 
     @Override
     public void setPlayerListFooter(String footer) {
-        
+
         getRealPlayer().setPlayerListFooter(footer);
     }
 
     @Override
     public void setPlayerListHeaderFooter(String header, String footer) {
-        
-        getRealPlayer().setPlayerListHeaderFooter(header,footer);
+
+        getRealPlayer().setPlayerListHeaderFooter(header, footer);
     }
 
     @Override
     public void setCompassTarget(Location loc) {
-        
+
         getRealPlayer().setCompassTarget(loc);
     }
 
     @Override
     public Location getCompassTarget() {
-        
+
         return getRealPlayer().getCompassTarget();
     }
 
     @Override
     public InetSocketAddress getAddress() {
-        
+
         return getRealPlayer().getAddress();
     }
 
     @Override
     public boolean isConversing() {
-        
+
         return getRealPlayer().isConversing();
     }
 
     @Override
     public void acceptConversationInput(String input) {
-        
+
         getRealPlayer().acceptConversationInput(input);
     }
 
     @Override
     public boolean beginConversation(Conversation conversation) {
-        
+
         return getRealPlayer().beginConversation(conversation);
     }
 
     @Override
     public void abandonConversation(Conversation conversation) {
-        
+
         getRealPlayer().abandonConversation(conversation);
     }
 
     @Override
     public void abandonConversation(Conversation conversation, ConversationAbandonedEvent details) {
-        
+
         getRealPlayer().abandonConversation(conversation, details);
     }
 
     @Override
     public void sendRawMessage(String message) {
-        
+
         getRealPlayer().sendRawMessage(message);
     }
 
     @Override
     public void kickPlayer(String message) {
-        
+
         getRealPlayer().kickPlayer(message);
     }
 
     @Override
     public void chat(String msg) {
-        
+
         getRealPlayer().chat(msg);
     }
 
     @Override
     public boolean performCommand(String command) {
-        
+
         return getRealPlayer().performCommand(command);
     }
 
     @Override
     public boolean isSneaking() {
-        
+
         return getRealPlayer().isSneaking();
     }
 
     @Override
     public void setSneaking(boolean sneak) {
-        
+
         getRealPlayer().setSneaking(sneak);
     }
 
     @Override
     public boolean isSprinting() {
-        
+
         return getRealPlayer().isSprinting();
     }
 
     @Override
     public void setSprinting(boolean sprinting) {
-        
+
         getRealPlayer().setSprinting(sprinting);
     }
 
@@ -237,7 +278,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void setSleepingIgnored(boolean isSleeping) {
-        
+
         getRealPlayer().setSleepingIgnored(isSleeping);
     }
 
@@ -249,12 +290,12 @@ public abstract class OniPlayer implements Player {
     @Deprecated
     @Override
     public void playNote(Location loc, byte instrument, byte note) {
-        getRealPlayer().playNote(loc,instrument,note);
+        getRealPlayer().playNote(loc, instrument, note);
     }
 
     @Override
     public void playNote(Location loc, Instrument instrument, Note note) {
-        getRealPlayer().playNote(loc,instrument,note);
+        getRealPlayer().playNote(loc, instrument, note);
     }
 
     @Override
@@ -271,6 +312,7 @@ public abstract class OniPlayer implements Player {
     public void playSound(Location location, Sound sound, SoundCategory category, float volume, float pitch) {
         getRealPlayer().playSound(location, sound, category, volume, pitch);
     }
+
     @Override
     public void playSound(Location location, String sound, SoundCategory category, float volume, float pitch) {
         getRealPlayer().playSound(location, sound, category, volume, pitch);
@@ -280,6 +322,7 @@ public abstract class OniPlayer implements Player {
     public void stopSound(Sound sound) {
         getRealPlayer().stopSound(sound);
     }
+
     @Override
     public void stopSound(String sound) {
         getRealPlayer().stopSound(sound);
@@ -294,27 +337,29 @@ public abstract class OniPlayer implements Player {
     public void stopSound(String sound, SoundCategory category) {
         getRealPlayer().stopSound(sound, category);
     }
+
     @Deprecated
     @Override
     public void playEffect(Location loc, Effect effect, int data) {
-        getRealPlayer().playEffect(loc,effect,data);
+        getRealPlayer().playEffect(loc, effect, data);
     }
 
     @Override
     public <T> void playEffect(Location loc, Effect effect, T data) {
-        getRealPlayer().playEffect(loc,effect,data);
+        getRealPlayer().playEffect(loc, effect, data);
     }
 
     @Deprecated
     @Override
     public void sendBlockChange(Location loc, Material material, byte data) {
-        getRealPlayer().sendBlockChange(loc,material,data);
+        getRealPlayer().sendBlockChange(loc, material, data);
     }
 
     @Override
     public void sendBlockChange(Location loc, BlockData block) {
-        getRealPlayer().sendBlockChange(loc,block);
+        getRealPlayer().sendBlockChange(loc, block);
     }
+
     @Deprecated
     @Override
     public boolean sendChunkChange(Location loc, int sx, int sy, int sz, byte[] data) {
@@ -323,7 +368,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void sendSignChange(Location loc, String[] lines) throws IllegalArgumentException {
-        getRealPlayer().sendSignChange(loc,lines);
+        getRealPlayer().sendSignChange(loc, lines);
     }
 
     @Override
@@ -451,7 +496,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void setPlayerTime(long time, boolean relative) {
-        getRealPlayer().setPlayerTime(time,relative);
+        getRealPlayer().setPlayerTime(time, relative);
     }
 
     @Override
@@ -588,7 +633,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void showPlayer(Plugin plugin, Player player) {
-        getRealPlayer().showPlayer(plugin,player);
+        getRealPlayer().showPlayer(plugin, player);
     }
 
     @Override
@@ -685,7 +730,7 @@ public abstract class OniPlayer implements Player {
     @Override
     @Deprecated
     public void sendTitle(String title, String subtitle) {
-        getRealPlayer().sendTitle(title,subtitle);
+        getRealPlayer().sendTitle(title, subtitle);
     }
 
     @Override
@@ -740,7 +785,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void spawnParticle(Particle particle, Location location, int count, double offsetX, double offsetY, double offsetZ, double extra) {
-        getRealPlayer().spawnParticle(particle,location,count,offsetX,offsetY,offsetZ,extra);
+        getRealPlayer().spawnParticle(particle, location, count, offsetX, offsetY, offsetZ, extra);
     }
 
     @Override
@@ -830,7 +875,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void setRotation(float yaw, float pitch) {
-        getRealPlayer().setRotation(yaw,pitch);
+        getRealPlayer().setRotation(yaw, pitch);
     }
 
     @Override
@@ -855,7 +900,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public List<Entity> getNearbyEntities(double x, double y, double z) {
-        return getRealPlayer().getNearbyEntities(x,y,z);
+        return getRealPlayer().getNearbyEntities(x, y, z);
     }
 
     @Override
@@ -1160,9 +1205,15 @@ public abstract class OniPlayer implements Player {
         return getRealPlayer().serialize();
     }
 
+    /**
+     * get player name but offline available. (cache)
+     *
+     * @return player name
+     * @since 1.0
+     */
     @Override
     public String getName() {
-        return isOffline()?cachedName:getRealPlayer().getName();
+        return isOffline() ? cachedName : getRealPlayer().getName();
     }
 
     @Override
@@ -1212,12 +1263,12 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public InventoryView openMerchant(Villager trader, boolean force) {
-        return getRealPlayer().openMerchant(trader,force);
+        return getRealPlayer().openMerchant(trader, force);
     }
 
     @Override
     public InventoryView openMerchant(Merchant merchant, boolean force) {
-        return getRealPlayer().openMerchant(merchant,force);
+        return getRealPlayer().openMerchant(merchant, force);
     }
 
     @Override
@@ -1261,7 +1312,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void setCooldown(Material material, int ticks) {
-        getRealPlayer().setCooldown(material,ticks);
+        getRealPlayer().setCooldown(material, ticks);
     }
 
     @Override
@@ -1269,14 +1320,27 @@ public abstract class OniPlayer implements Player {
         return getRealPlayer().getSleepTicks();
     }
 
+    /**
+     * Get the bed spawn location but offline available
+     *
+     * @return BedSpawnLocation
+     * @since 1.0
+     */
     @Override
     public Location getBedSpawnLocation() {
-        return isOffline()?asOfflinePlayer().getBedSpawnLocation():getRealPlayer().getBedSpawnLocation();
+        return isOffline() ? asOfflinePlayer().getBedSpawnLocation() : getRealPlayer().getBedSpawnLocation();
     }
 
+    /**
+     * **MENTION** Not offline available.
+     *
+     * @param location
+     * @since 1.0
+     */
     @Override
     public void setBedSpawnLocation(Location location) {
         getRealPlayer().setBedSpawnLocation(location);
+        //todo offline available
     }
 
     @Override
@@ -1613,7 +1677,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public <T> void setMemory(MemoryKey<T> memoryKey, T memoryValue) {
-        getRealPlayer().setMemory(memoryKey,memoryValue);
+        getRealPlayer().setMemory(memoryKey, memoryValue);
     }
 
     @Override
@@ -1638,7 +1702,8 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void setHealth(double health) {
-        getRealPlayer().setHealth(health);;
+        getRealPlayer().setHealth(health);
+        ;
     }
 
     @Override
@@ -1772,7 +1837,7 @@ public abstract class OniPlayer implements Player {
 
     @Override
     public void sendPluginMessage(Plugin source, String channel, byte[] message) {
-        getRealPlayer().sendPluginMessage(source,channel,message);
+        getRealPlayer().sendPluginMessage(source, channel, message);
     }
 
     @Override
@@ -1790,7 +1855,14 @@ public abstract class OniPlayer implements Player {
         return getRealPlayer().launchProjectile(projectile, velocity);
     }
 
+    /**
+     * get formatted name of the player.
+     * Example: iceBear67(0000-00000000(uuid))
+     *
+     * @return formatted name of the player
+     * @since 1.0
+     */
     public String toString() {
-        return cachedName+" ("+player.toString()+")";
+        return cachedName + " (" + player.toString() + ")";
     }
 }

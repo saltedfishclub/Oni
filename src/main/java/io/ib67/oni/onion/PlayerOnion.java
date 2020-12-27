@@ -2,7 +2,8 @@ package io.ib67.oni.onion;
 
 import io.ib67.oni.ConstPrefix;
 import io.ib67.oni.Oni;
-import io.ib67.oni.mock.OniPlayer;
+import io.ib67.oni.internal.mock.OniPlayer;
+import io.ib67.oni.util.annotation.LowLevelAPI;
 import io.ib67.oni.util.text.TextUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -14,6 +15,12 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 
+/**
+ * The player onion.
+ *
+ * @see OniPlayer
+ * @since 1.0
+ */
 public final class PlayerOnion extends OniPlayer {
     private static final Map<UUID, PlayerOnion> caches = new WeakHashMap<>();
     private final Oni oniCore;
@@ -25,6 +32,7 @@ public final class PlayerOnion extends OniPlayer {
         this.oniCore = oni;
     }
 
+    @LowLevelAPI
     public static Optional<PlayerOnion> of(Player player, Oni oni) {
         Validate.notNull(player, "Player cant be null.");
         if (player instanceof OniPlayer) {
@@ -33,6 +41,7 @@ public final class PlayerOnion extends OniPlayer {
         return of(player.getUniqueId(), oni);
     }
 
+    @LowLevelAPI
     public static Optional<PlayerOnion> of(String playerName, Oni oni) {
         Validate.notNull(playerName, "PlayerNaime cannot be null");
         Validate.notEmpty(playerName, "Player Name cant be empty");
@@ -41,6 +50,7 @@ public final class PlayerOnion extends OniPlayer {
         return of(player, oni);
     }
 
+    @LowLevelAPI
     public static Optional<PlayerOnion> of(UUID uuid, Oni oni) {
         Validate.notNull(uuid, "UUID CANNOT BE NULL!!");
         if (Bukkit.getPlayer(uuid) == null) {
@@ -56,16 +66,22 @@ public final class PlayerOnion extends OniPlayer {
         return tempPermissions.contains(name) ? tempPermissions.remove(name) : super.hasPermission(name);
     }
 
+    /**
+     * The onion controller
+     *
+     * @since 1.0
+     */
     public static class Accessor {
         private final PlayerOnion onion;
 
+        @LowLevelAPI
         public Accessor(PlayerOnion onion) {
             this.onion = onion;
         }
 
         /**
          * Add temp permission
-         *
+         * @since 1.0
          * @return false if player already has this temp-permission.
          */
         public Accessor addTempPermission(String permission) {
@@ -79,7 +95,7 @@ public final class PlayerOnion extends OniPlayer {
 
         /**
          * Send a message with color
-         *
+         * @since 1.0
          * @param message
          */
         public Accessor sendMessage(String message) {
@@ -90,7 +106,7 @@ public final class PlayerOnion extends OniPlayer {
 
         /**
          * Send message with prefix
-         *
+         * @since 1.0
          * @param message
          */
         public Accessor info(String message) {
@@ -101,7 +117,7 @@ public final class PlayerOnion extends OniPlayer {
 
         /**
          * Warn a player
-         *
+         * @since 1.0
          * @param message
          * @return accessor
          */
@@ -112,8 +128,8 @@ public final class PlayerOnion extends OniPlayer {
         }
 
         /**
-         * print fatal error
-         *
+         * send fatal error message
+         * @since 1.0
          * @param message
          * @return
          */
@@ -127,7 +143,7 @@ public final class PlayerOnion extends OniPlayer {
 
         /**
          * Remind a player to do sth
-         *
+         * @since 1.0
          * @param message
          * @return
          */
@@ -140,7 +156,7 @@ public final class PlayerOnion extends OniPlayer {
 
         /**
          * Send action bar message
-         *
+         * @since 1.0
          * @param message
          * @return
          */

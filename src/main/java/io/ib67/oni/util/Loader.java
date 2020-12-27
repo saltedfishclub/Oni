@@ -1,6 +1,7 @@
 package io.ib67.oni.util;
 
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.ApiStatus;
 import sun.misc.Unsafe;
 
 import java.io.File;
@@ -14,9 +15,13 @@ import java.net.URLClassLoader;
 
 
 /**
+ * Loader from TabooLib:Bootstrap
+ *
  * @author sky
  * @since 2020-04-12 22:39
  */
+@SuppressWarnings("all")
+@ApiStatus.Internal
 public class Loader {
 
     static MethodHandles.Lookup lookup;
