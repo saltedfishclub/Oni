@@ -23,8 +23,6 @@ dependencies {
     compile project(":MavenDownloader")
     compileOnly parent
 }
-Properties localConf = new Properties()
-localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
 publishing{
     publications{
         artifact(MavenPublication) {
@@ -41,14 +39,21 @@ publishing{
             name = "TmpLocal"
         }
         maven {
-            def baseUrl="https://repo.sfclub.cc"
+            def repoAlias="",repoToken="";
+            if(file("${System.getProperty("user.home")}/.gradle/gradle.properties").exists()){
+                Properties localConf = new Properties()
+                localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
+                repoAlias = localConf.getProperty("SF_REPO_ALIAS")
+                repoToken = localConf.getProperty("SF_REPO_TOKEN")
+            }
+            def baseUrl = "https://repo.sfclub.cc"
             def releasesRepoUrl = "$baseUrl/releases"
             def snapshotsRepoUrl = "$baseUrl/snapshots"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             name = "SFOfficial"
             credentials {
-                username = localConf.getProperty("SF_REPO_ALIAS")
-                password = localConf.getProperty("SF_REPO_TOKEN")
+                username = repoAlias
+                password = repoToken
             }
         }
     }
