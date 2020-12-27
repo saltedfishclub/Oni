@@ -46,8 +46,6 @@ dependencies {
     orchidRuntime "io.github.javaeden.orchid:OrchidJavadoc:0.21.0"
     orchidRuntime("io.github.javaeden.orchid:OrchidPluginDocs:0.21.0")
 }
-Properties localConf = new Properties()
-localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
 publishing {
     publications {
         artifact(MavenPublication) {
@@ -64,6 +62,8 @@ publishing {
             name = "TmpLocal"
         }
         maven {
+            Properties localConf = new Properties()
+            localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
             def baseUrl = "https://repo.sfclub.cc"
             def releasesRepoUrl = "$baseUrl/releases"
             def snapshotsRepoUrl = "$baseUrl/snapshots"
