@@ -8,7 +8,7 @@ plugins {
     id "maven-publish"
 }
 group 'io.ib67.oni'
-def ver = '1-1.0'
+def ver = '1.0-M1'
 version = ver
 targetCompatibility=1.8
 sourceCompatibility=1.8
