@@ -18,14 +18,17 @@ import java.util.logging.Logger;
  * @since 1.0
  */
 public class Oni {
-    public static final int VERSION=1;
+    /**
+     * the major version number.
+     */
+    public static final int VERSION = 1;
     @Getter
     private final JavaPlugin plugin;
-    private static final Map<String,Oni> claimedOni=new HashMap<>();
+    private static final Map<String, Oni> claimedOni = new HashMap<>();
     @Setter
     @Getter
     private String messagePrefix;
-    public static final String DEFAULT_MESSAGE_PREFIX="&b%s &7>> &f";
+    public static final String DEFAULT_MESSAGE_PREFIX = "&b%s &7>> &f";
     @Getter
     private static final List<URL> loadedDeps = new ArrayList<>();
     @Getter

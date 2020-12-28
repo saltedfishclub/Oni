@@ -1,6 +1,7 @@
 package io.ib67.oni.internal.mock;
 
 import io.ib67.oni.exception.player.PlayerOfflineException;
+import io.ib67.oni.util.annotation.LowLevelAPI;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.bukkit.*;
@@ -53,6 +54,8 @@ public abstract class OniPlayer implements Player {
     private final String cachedName;
     private WeakReference<Player> playerRefs;
 
+    @LowLevelAPI
+    @ApiStatus.Internal
     protected OniPlayer(UUID player) {
         this.player = player;
         this.cachedName = getRealPlayer().getName();
