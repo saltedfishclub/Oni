@@ -86,9 +86,6 @@ public final class PlayerOnion extends OniPlayer {
          */
         public Accessor addTempPermission(String permission) {
             Validate.notNull(permission, "Permission cannot be null");
-            if (onion.tempPermissions.contains(permission)) {
-                return this;
-            }
             onion.tempPermissions.add(permission);
             return this;
         }

@@ -1,11 +1,14 @@
 package io.ib67.oni;
 
+import io.ib67.oni.onion.ItemOnion;
 import io.ib67.oni.onion.PlayerOnion;
 import io.ib67.oni.util.annotation.LowLevelAPI;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.net.URL;
@@ -85,8 +88,36 @@ public class Oni {
      *
      * @param player name
      * @return onion
+     * @since 1.0
      */
     public Optional<PlayerOnion> onionOf(String player) {
         return PlayerOnion.of(player, this);
     }
+
+    /**
+     * get a itemOnion by itemStack
+     *
+     * @param itemStack wrap target
+     * @return itemonion
+     * @since 1.0
+     */
+    public ItemOnion onionOf(ItemStack itemStack) {
+        return ItemOnion.of(itemStack);
+    }
+
+    /**
+     * get a item onion by material
+     *
+     * @param itemMaterial material
+     * @return Optional<ItemOnion>,Empty when material is air
+     */
+    public Optional<ItemOnion> onionOf(Material itemMaterial) {
+        switch (itemMaterial) {
+            case AIR:
+                return Optional.empty();
+            default:
+                return Optional.of(ItemOnion.of(itemMaterial));
+        }
+    }
+
 }

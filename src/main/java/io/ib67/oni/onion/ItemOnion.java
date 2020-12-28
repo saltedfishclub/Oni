@@ -30,7 +30,7 @@ public class ItemOnion extends OniItem {
     protected ItemOnion(ItemStack item) {
         super(item);
         oni = new Accessor(this);
-        itemMeta = ItemMetaOnion.of(item.getItemMeta());
+        itemMeta = ItemMetaOnion.of(item.getItemMeta(), this);
     }
 
     /**
@@ -40,13 +40,14 @@ public class ItemOnion extends OniItem {
      * @return itemOnion
      * @since 1.0
      */
+    @LowLevelAPI
     public static ItemOnion of(@NonNull ItemStack itemStack) {
         Validate.isTrue(!(itemStack instanceof OniItem), "ItemOnion cant proxy another oniItem!");
         return new ItemOnion(itemStack);
     }
 
     /**
-     * create itemonion
+     * create itemOnion,may produce unexpected error when material is air.
      *
      * @param material material
      * @return itemOnion
@@ -93,7 +94,7 @@ public class ItemOnion extends OniItem {
         if (im instanceof OniItemMeta) {
             return setItemMeta((ItemMetaOnion) im);
         } else {
-            return setItemMeta(ItemMetaOnion.of(im));
+            return setItemMeta(ItemMetaOnion.of(im, this));
         }
     }
 
