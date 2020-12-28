@@ -45,7 +45,7 @@ public abstract class OniModule extends JavaPlugin {
         Validate.notNull(textRes, "Broken plugin (Missing oni.setting.json)");
         oniSetting = gson.fromJson(textRes, OniSetting.class);
         downloader = new MavenDownloader(oniSetting.additionalRepos);
-        try {
+/*        try {
             Class.forName("io.ib67.oni.Oni");
             // Class found!
             String[] versions = oniSetting.oniVersion.split("\\.");
@@ -61,14 +61,14 @@ public abstract class OniModule extends JavaPlugin {
                     return;
                 }
             }
-        } catch (ClassNotFoundException ignored) {
+        } catch (ClassNotFoundException ignored) {*/
             // We're first!
-            if (!startInjection(false)) {
-                getLogger().warning("Failed to load oni,plugin will not work.");
-                setEnabled(false);
-                return;
-            }
+        if (!startInjection(true)) {
+            getLogger().warning("Failed to load oni,plugin will not work.");
+            setEnabled(false);
+            return;
         }
+        //}
         //Resolve dependencies.
         if (!resolveDependencies(oniSetting.dependencies)) {
             getLogger().warning("Failed to solve dependencies,plugin will not work.");
@@ -102,7 +102,7 @@ public abstract class OniModule extends JavaPlugin {
     }
 
     private boolean startInjection(boolean capabilityMode) {
-        Dependency dep = new Dependency("Oni", "io.ib67.oni", oniSetting.oniVersion);
+        Dependency dep = new Dependency("Oni-all", "io.ib67.oni", oniSetting.oniVersion);
         File file = MavenDownloader.dependencyToFile(dep);
         if (!file.exists() || file.getTotalSpace() == 0) {
             // Download oni first
