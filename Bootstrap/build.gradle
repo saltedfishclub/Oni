@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'io.ib67.oni'
-def ver = "1.0"
+def ver = "2.0"
 version ver
 targetCompatibility=1.8
 sourceCompatibility=1.8

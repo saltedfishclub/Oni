@@ -48,7 +48,7 @@ public abstract class OniModule extends JavaPlugin {
         try {
             Class.forName("io.ib67.oni.Oni");
             // Class found!
-            String[] versions = oniSetting.oniVersion.split("-");
+            String[] versions = oniSetting.oniVersion.split("\\.");
             if (versions.length < 2) {
                 getLogger().warning("Illegal oni version,Please contact plugin author.");
                 return;
