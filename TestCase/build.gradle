@@ -14,7 +14,7 @@ buildscript{
         maven { url = "https://repo.sfclub.cc/releases"}
     }
     dependencies{
-        classpath 'io.ib67.oni:Linker:1.1'
+        classpath 'io.ib67.oni:Linker:1.2'
     }
 }
 oni{
@@ -32,14 +32,11 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
-    maven {
-        url = "https://repo.sfclub.cc/snapshots/"
-    }
 }
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
     // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-    oniRuntime group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.0'
+    compile 'io.ib67.oni:Oni-all:1.0-M1-dev-1'
 }
 
 processResources {

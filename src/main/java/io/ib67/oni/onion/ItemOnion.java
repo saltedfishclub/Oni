@@ -71,6 +71,8 @@ public class ItemOnion extends OniItem {
      * Set oniItemMeta
      * possible fail if OIM internal IM isn't compat.
      *
+     * @param im im
+     * @return succeed
      * @since 1.0
      * @deprecated use withMeta.
      */
@@ -101,6 +103,7 @@ public class ItemOnion extends OniItem {
     /**
      * set item name
      *
+     * @param name name
      * @since 1.0
      */
     @DelegateMethod(ItemMeta.class)
@@ -121,6 +124,7 @@ public class ItemOnion extends OniItem {
     /**
      * Add lore to itemMeta
      *
+     * @param lores lores
      * @return self
      * @since 1.0
      */

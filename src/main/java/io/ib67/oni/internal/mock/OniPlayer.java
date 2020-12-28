@@ -93,9 +93,9 @@ public abstract class OniPlayer implements Player {
 
     /**
      * Get the unwrapped player with offline check
+     * throws PlayerOfflineException
      *
      * @return player
-     * @throws PlayerOfflineException
      * @since 1.0
      */
     @NonNull
@@ -1337,7 +1337,7 @@ public abstract class OniPlayer implements Player {
     /**
      * **MENTION** Not offline available.
      *
-     * @param location
+     * @param location bed location
      * @since 1.0
      */
     @Override

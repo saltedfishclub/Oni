@@ -10,7 +10,7 @@ import org.bukkit.ChatColor;
  */
 public class TextUtil {
     /**
-     * Translate Color such as "&aHi!"
+     * <p>Translate Color Char ("and" char)
      *
      * @param msg target message
      * @return translated message

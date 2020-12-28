@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Oni Item Util
  *
- * @since
+ * @since 1.0
  */
 public abstract class OniItem extends ItemStack implements Exportable<ItemStack> {
     protected final ItemStack realItem;

@@ -109,7 +109,7 @@ public class Oni {
      * get a item onion by material
      *
      * @param itemMaterial material
-     * @return Optional<ItemOnion>,Empty when material is air
+     * @return Optional(ItemOnion) ,Empty when material is air
      */
     public Optional<ItemOnion> onionOf(Material itemMaterial) {
         switch (itemMaterial) {

@@ -1,4 +1,4 @@
 rootProject.name = 'Oni'
-include 'Bootstrap'
+include 'BootStrap'
 include 'MavenDownloader'
 include 'TestCase'

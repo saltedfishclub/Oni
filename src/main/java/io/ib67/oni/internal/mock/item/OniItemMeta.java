@@ -249,7 +249,7 @@ public abstract class OniItemMeta implements ItemMeta, Exportable<ItemMeta> {
     }
 
     /**
-     * @param i
+     * @param i ver
      * @deprecated
      */
     @Deprecated

@@ -46,6 +46,9 @@ public class Loader {
      * 读取后不会随着插件的卸载而卸载
      * 请在执行前判断是否已经被读取
      * 防止出现未知错误
+     *
+     * @param file   file
+     * @param loader loader
      */
     public static void addPath(File file, ClassLoader loader) {
         try {

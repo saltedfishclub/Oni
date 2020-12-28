@@ -4,8 +4,7 @@ plugins {
 }
 
 group 'io.ib67.oni'
-def ver='1.0'
-version ver
+version "1.0"
 targetCompatibility=1.8
 sourceCompatibility=1.8
 repositories {
@@ -18,39 +17,4 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compileOnly group: 'commons-io', name: 'commons-io', version: '2.8.0'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-}
-publishing{
-    publications{
-        artifact(MavenPublication) {
-            groupId = "io.ib67.oni"
-            artifactId = "MavenDownloader"
-            version = ver
-
-            from components.java
-        }
-    }
-    repositories{
-        maven {
-            url = "/tmp/repo"
-            name = "TmpLocal"
-        }
-        maven {
-            def repoAlias="",repoToken="";
-            if(file("${System.getProperty("user.home")}/.gradle/gradle.properties").exists()){
-                Properties localConf = new Properties()
-                localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
-                repoAlias = localConf.getProperty("SF_REPO_ALIAS")
-                repoToken = localConf.getProperty("SF_REPO_TOKEN")
-            }
-            def baseUrl = "https://repo.sfclub.cc"
-            def releasesRepoUrl = "$baseUrl/releases"
-            def snapshotsRepoUrl = "$baseUrl/snapshots"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            name = "SFOfficial"
-            credentials {
-                username = repoAlias
-                password = repoToken
-            }
-        }
-    }
 }

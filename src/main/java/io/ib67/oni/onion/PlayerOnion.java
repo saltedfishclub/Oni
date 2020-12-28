@@ -81,8 +81,10 @@ public final class PlayerOnion extends OniPlayer {
 
         /**
          * Add temp permission
-         * @since 1.0
+         *
+         * @param permission perm
          * @return false if player already has this temp-permission.
+         * @since 1.0
          */
         public Accessor addTempPermission(String permission) {
             Validate.notNull(permission, "Permission cannot be null");
@@ -93,7 +95,8 @@ public final class PlayerOnion extends OniPlayer {
         /**
          * Send a message with color
          * @since 1.0
-         * @param message
+         * @param message message
+         * @return accessor
          */
         public Accessor sendMessage(String message) {
             Validate.notNull(message, "Message cannot be null");
@@ -104,7 +107,8 @@ public final class PlayerOnion extends OniPlayer {
         /**
          * Send message with prefix
          * @since 1.0
-         * @param message
+         * @param message message
+         * @return this
          */
         public Accessor info(String message) {
             Validate.notNull(message, "Message cannot be null");
@@ -115,7 +119,7 @@ public final class PlayerOnion extends OniPlayer {
         /**
          * Warn a player
          * @since 1.0
-         * @param message
+         * @param message msg
          * @return accessor
          */
         public Accessor warn(String message) {
@@ -127,8 +131,8 @@ public final class PlayerOnion extends OniPlayer {
         /**
          * send fatal error message
          * @since 1.0
-         * @param message
-         * @return
+         * @param message msg
+         * @return this
          */
         public Accessor fatal(String message) {
             Validate.notNull(message, "Message cannot be null");
@@ -141,8 +145,8 @@ public final class PlayerOnion extends OniPlayer {
         /**
          * Remind a player to do sth
          * @since 1.0
-         * @param message
-         * @return
+         * @param message msg
+         * @return this
          */
         public Accessor tip(String message) {
             Validate.notNull(message, "Message cannot be null");
@@ -154,8 +158,8 @@ public final class PlayerOnion extends OniPlayer {
         /**
          * Send action bar message
          * @since 1.0
-         * @param message
-         * @return
+         * @param message msg
+         * @return this
          */
         public Accessor sendActionBar(String message) {
             onion.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(message));

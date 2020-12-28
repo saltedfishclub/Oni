@@ -8,8 +8,7 @@ plugins {
     id "maven-publish"
 }
 group 'io.ib67.oni'
-def ver = '1.0-M1'
-version = ver
+version "1.0-M1-dev-1"
 targetCompatibility=1.8
 sourceCompatibility=1.8
 repositories {
@@ -25,14 +24,64 @@ repositories {
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
 }
+shadowJar{
+    relocate 'com.github.kevinsawicki.http','io.ib67.oni.util.network'
+}
 allprojects {
     repositories {
         maven { url = "https://jitpack.io" }
     }
-
+    compileJava {
+        options.compilerArgs << '-XDignore.symbol.file'
+        options.fork = true
+        options.forkOptions.executable = 'javac'
+    }
+   java{
+       withSourcesJar()
+       withJavadocJar()
+   }
+    afterEvaluate{
+        if(!project.name.contains("Test")){
+            publishing {
+                publications {
+                    mavenJars(MavenPublication) {
+                        groupId = project.property("group")
+                        artifactId = project.name
+                        version = project.version
+                        from project.components.java
+                    }
+                }
+                repositories {
+                    maven {
+                        url = "/tmp/repo"
+                        name = "TmpLocal"
+                    }
+                    maven {
+                        def repoAlias="",repoToken="";
+                        if(file("${System.getProperty("user.home")}/.gradle/gradle.properties").exists()){
+                            Properties localConf = new Properties()
+                            localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
+                            repoAlias = localConf.getProperty("SF_REPO_ALIAS")
+                            repoToken = localConf.getProperty("SF_REPO_TOKEN")
+                        }
+                        def baseUrl = "https://repo.sfclub.cc"
+                        def releasesRepoUrl = "$baseUrl/releases"
+                        def snapshotsRepoUrl = "$baseUrl/snapshots"
+                        url = project.version.toString().contains("dev") ? snapshotsRepoUrl : releasesRepoUrl
+                        name = "SFOfficial"
+                        credentials {
+                            username = repoAlias
+                            password = repoToken
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 subprojects {
     apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: "maven-publish"
 }
 dependencies {
     compileOnly 'org.spigotmc:spigot:1.14.4-R0.1-20191224.232152-15'
@@ -50,44 +99,20 @@ dependencies {
     orchidRuntime "io.github.javaeden.orchid:OrchidJavadoc:0.21.0"
     orchidRuntime("io.github.javaeden.orchid:OrchidPluginDocs:0.21.0")
 }
-publishing {
-    publications {
-        artifact(MavenPublication) {
-            groupId = "io.ib67.oni"
-            artifactId = "Oni"
-            version = ver
-
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            url = "/tmp/repo"
-            name = "TmpLocal"
-        }
-        maven {
-            def repoAlias="",repoToken="";
-            if(file("${System.getProperty("user.home")}/.gradle/gradle.properties").exists()){
-                Properties localConf = new Properties()
-                localConf.load(new FileReader("${System.getProperty("user.home")}/.gradle/gradle.properties"))
-                repoAlias = localConf.getProperty("SF_REPO_ALIAS")
-                repoToken = localConf.getProperty("SF_REPO_TOKEN")
-            }
-            def baseUrl = "https://repo.sfclub.cc"
-            def releasesRepoUrl = "$baseUrl/releases"
-            def snapshotsRepoUrl = "$baseUrl/snapshots"
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-            name = "SFOfficial"
-            credentials {
-                username = repoAlias
-                password = repoToken
-            }
-        }
-    }
-}
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         filter ReplaceTokens, tokens: [version: version]
+    }
+}
+publishing{
+    publications{
+        fatJar(MavenPublication){ publication ->
+            //For download directly. Full dependencies
+            groupId = project.property("group")
+            artifactId = project.name+"-all"
+            version = project.version
+            project.shadow.component(publication)
+        }
     }
 }
 def docLang=getLang()
@@ -105,3 +130,4 @@ String getLang(){
 orchid {
     srcDir  = "orchid/locale/${docLang}"
 }
+//task shadowFlag{}
