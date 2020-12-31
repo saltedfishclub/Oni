@@ -1,0 +1,55 @@
+# For other languages,Copy this folder && rename.
+# Waiting for improvement. iceBear67 isn't understand how orchid working.
+site:
+  theme: 'Editorial'
+  #baseUrl: 'http://username.github.io/project'
+  about:
+    siteName: Oni
+    siteDescription: Javadoc and Code Examples for Oni.
+
+theme:
+  primaryColor: ' #3F51B5'
+  legacySearch: false
+  social:
+    github: 'saltedfishclub/Oni'
+  metaComponents:
+    - type: 'orchidSearch'
+  menu:
+    - type: 'separator'
+      title: 'Wiki'
+    - type: 'wiki'
+    - type: 'separator'
+      title: 'API Docs'
+    - type: 'page'
+      itemId: 'hello'
+    - type: 'sourcedocPages'
+      moduleType: 'javadoc'
+      node: 'classes'
+      asSubmenu: true
+      submenuTitle: 'Classes'
+
+    - type: 'sourcedocPages'
+      moduleType: 'javadoc'
+      node: 'packages'
+      asSubmenu: true
+      submenuTitle: 'Packages'
+indices:
+  includeFrom:
+    - 'wiki'
+    - 'javadoc'
+allPages:
+  metaComponents:
+    - type: 'prism'
+      languages:
+        - 'java'
+        - 'kotlin'
+        - 'yaml'
+javadoc:
+  sourceDirs:
+    - './../../../src/main/java'
+  pages:
+    menu:
+      - type: 'sourcedocPageLinks'
+        moduleType: 'javadoc'
+        itemTitleType: 'SIGNATURE'
+        includeItems: true

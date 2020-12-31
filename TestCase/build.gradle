@@ -1,27 +1,12 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 apply plugin: 'java'
-apply plugin: 'io.ib67.oni.linker'
 
 group = 'io.ib67.oni'
 version = '1.0'
 
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
-buildscript{
-    repositories{
-        mavenCentral()
-        maven { url = "https://repo.sfclub.cc/releases"}
-    }
-    dependencies{
-        classpath 'io.ib67.oni:Linker:1.2'
-    }
-}
-oni{
-    oniVersion="1-1.0"
-    bootstrapVersion = "1.0"
-}
-
 repositories {
     mavenCentral()
     maven {
@@ -35,6 +20,7 @@ repositories {
 }
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+    compile project(":BootStrap")
 }
 
 processResources {

@@ -5,6 +5,11 @@ import io.ib67.oni.OniModule;
 public final class TestCase extends OniModule {
 
     @Override
+    public void preEnabled() {
+
+    }
+
+    @Override
     public void beforeEnable() {
 
     }

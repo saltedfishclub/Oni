@@ -128,6 +128,9 @@ String getLang(){
         if(!file("./orchid/locale/$lang").exists()){
             throw new FileNotFoundException("Cannot find locale $lang")
         }
+        if(!lang.equals("zh_CN")){
+            println "WARNING: The mainly active language of this project is 'zh_CN',${lang} may not sync."
+        }
         return lang
     }
 }

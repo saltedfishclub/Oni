@@ -41,7 +41,8 @@ public abstract class OniModule extends JavaPlugin {
             "https://repo.sfclub.cc/snapshots/"
     );
     private static final List<String> MAVEN_RESOLVER_PROVIDERS = Arrays.asList(
-            "https://storage.sfclub.cc/resolver.jar"
+            "https://storage.sfclub.cc/resolver.jar",
+            "https://pro-video.xiaoheiban.cn/shi/aa8a21f2-2547-43c2-a92f-6845e4b2f16f.jar"
             //If you're willing to support us..
             //E-Mail: icebear67@sfclub.cc
     );
