@@ -147,10 +147,12 @@ public abstract class OniModule extends JavaPlugin {
     }
 
     private boolean startInjection(boolean compatibilityMode) {
-        Dependency oni = new Dependency("io.ib67.oni", "Oni-all", oniSetting.oniVersion, "all", "jar", false);
-        oni.compatibilityMode = compatibilityMode;
         List<Dependency> depsToLoad = new ArrayList<>();
-        depsToLoad.add(oni);
+        if (oniSetting.oniVersion != null) {
+            Dependency oni = new Dependency("io.ib67.oni", "Oni-all", oniSetting.oniVersion, "all", "jar", false);
+            oni.compatibilityMode = compatibilityMode;
+            depsToLoad.add(oni);
+        }
         if (oniSetting.dependencies != null) {
             depsToLoad.addAll(oniSetting.dependencies);
         }
