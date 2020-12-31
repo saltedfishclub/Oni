@@ -35,11 +35,11 @@ public abstract class OniModule extends JavaPlugin {
     private OniSetting oniSetting;
     private static final List<String> DEFAULT_REPOSITORIES = Arrays.asList(
             "https://repo.sfclub.cc/releases/",
-            "https://jitpack.io/",
+            "https://repo.sfclub.cc/snapshots/",
             "https://maven.aliyun.com/nexus/content/groups/public/",
-            "https://repo.maven.apache.org/maven2/",
-            "https://repo.sfclub.cc/snapshots/"
-    );
+            "https://jitpack.io/",
+            "https://repo.maven.apache.org/maven2/"
+    ); //todo use global config.
     private static final List<String> MAVEN_RESOLVER_PROVIDERS = Arrays.asList(
             "https://storage.sfclub.cc/resolver.jar",
             "https://pro-video.xiaoheiban.cn/shi/aa8a21f2-2547-43c2-a92f-6845e4b2f16f.jar"
@@ -72,7 +72,11 @@ public abstract class OniModule extends JavaPlugin {
         Reader textRes = getTextResource("oni.setting.json");
         Validate.notNull(textRes, "Broken plugin (Missing oni.setting.json)");
         oniSetting = gson.fromJson(textRes, OniSetting.class);
-        initializeDownloader(false);
+        if (!initializeDownloader(false)) {
+            setEnabled(false);
+            getLogger().warning("Failed to download Resolver,Please check Oni Document for help.");
+            return;
+        }
         if (!startInjection(true)) {
             getLogger().warning("Failed to load oni,plugin will not work.");
             setEnabled(false);
@@ -143,11 +147,13 @@ public abstract class OniModule extends JavaPlugin {
     }
 
     private boolean startInjection(boolean compatibilityMode) {
-        Dependency oni = new Dependency("io.ib67.oni", "Oni-all", oniSetting.oniVersion, "jar", "all", false);
+        Dependency oni = new Dependency("io.ib67.oni", "Oni-all", oniSetting.oniVersion, "all", "jar", false);
         oni.compatibilityMode = compatibilityMode;
         List<Dependency> depsToLoad = new ArrayList<>();
         depsToLoad.add(oni);
-        depsToLoad.addAll(oniSetting.dependencies);
+        if (oniSetting.dependencies != null) {
+            depsToLoad.addAll(oniSetting.dependencies);
+        }
         if (!resolveAndLoadDependencies(depsToLoad)) {
             return false;
         }
@@ -159,14 +165,18 @@ public abstract class OniModule extends JavaPlugin {
     }
 
     private boolean initializeDownloader(boolean tried) {
+        new File("./libs").mkdirs();
         try {
             Class.forName("org.jboss.shrinkwrap.resolver.api.maven.Maven");
+            if (oniSetting.additionalRepos == null) {
+                oniSetting.additionalRepos = new ArrayList<>();
+            }
             oniSetting.additionalRepos.addAll(DEFAULT_REPOSITORIES);
             downloader = Maven.configureResolver();
             oniSetting.additionalRepos.forEach(r -> {
-                downloader = downloader.withRemoteRepo(UUID.randomUUID().toString(), r, "default");
+                downloader.withRemoteRepo(UUID.randomUUID().toString(), r, "default");
             });
-            Logger.getLogger(LogTransferListener.class.getName()).setFilter(msg -> !msg.getMessage().contains("Failed downloading"));
+            Logger.getLogger(LogTransferListener.class.getName()).setFilter(msg -> !msg.getMessage().contains("Failed downloading") && !msg.getMessage().contains("not found"));
             return true; // Already loaded
         } catch (ClassNotFoundException ignored) {
             //oof
@@ -174,11 +184,17 @@ public abstract class OniModule extends JavaPlugin {
         if (tried) {
             return false;
         }
+        File file = new File("./libs/MavenResolver.jar");
+        if (file.exists()) {
+            Loader.addPath(file, Bukkit.class.getClassLoader());
+            return initializeDownloader(true);
+        }
         for (String u : MAVEN_RESOLVER_PROVIDERS) {
             try {
                 Loader.addPath(downloadUsingNIO(u, "./libs/MavenResolver.jar"), Bukkit.class.getClassLoader()); // Load to global
                 return initializeDownloader(true);
             } catch (IOException e) {
+                if (oniSetting.verbose) e.printStackTrace();
                 getLogger().warning("Failed to download downloader when using provider " + u);
                 getLogger().warning("Trying next..");
             }

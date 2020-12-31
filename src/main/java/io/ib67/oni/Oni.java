@@ -22,9 +22,9 @@ import java.util.logging.Logger;
  */
 public class Oni {
     /**
-     * the major version number.
+     * SemVer
      */
-    public static final int VERSION = 1;
+    public static final String SEM_VERSION = "1.0-M1-dev-1";
     @Getter
     private final JavaPlugin plugin;
     private static final Map<String, Oni> claimedOni = new HashMap<>();

@@ -52,7 +52,9 @@ public class Loader {
     public static void addPath(File file, ClassLoader loader) {
         try {
             //ClassLoader loader = Bukkit.class.getClassLoader();
-            if ("LaunchClassLoader".equals(loader.getClass().getSimpleName())) {
+            if ("PluginClassLoader".equals(loader.getClass().getSimpleName())) {
+                ADD_URL_METHOD.invoke(loader, file.toURL());
+            } else if ("LaunchClassLoader".equals(loader.getClass().getSimpleName())) {
                 MethodHandle methodHandle = lookup.findVirtual(loader.getClass(), "addURL", MethodType.methodType(void.class, java.net.URL.class));
                 methodHandle.invoke(loader, file.toURI().toURL());
             } else {

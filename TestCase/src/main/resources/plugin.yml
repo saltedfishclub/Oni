@@ -1,4 +1,4 @@
 name: TestCase
 version: @version@
 main: io.ib67.oni.testcase.TestCase
-api-version: 1.16
+api-version: 1.13
