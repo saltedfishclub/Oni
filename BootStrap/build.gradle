@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'io.ib67.oni'
-version "3.0"
+version "3.1"
 targetCompatibility=1.8
 sourceCompatibility=1.8
 repositories {
@@ -21,6 +21,6 @@ repositories {
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.14.4-R0.1-SNAPSHOT'
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile project(":MavenDownloader")
+    compileOnly group: 'org.jboss.shrinkwrap.resolver', name: 'shrinkwrap-resolver-impl-maven', version: '3.1.4'
     compileOnly parent
 }

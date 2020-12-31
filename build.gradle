@@ -87,7 +87,6 @@ dependencies {
     compileOnly 'org.spigotmc:spigot:1.14.4-R0.1-20191224.232152-15'
     testCompileOnly 'org.spigotmc:spigot:1.14.4-R0.1-20191224.232152-15'
     compileOnly 'org.jetbrains:annotations:20.1.0'
-    compile project(":MavenDownloader")
     compile group: 'com.github.kevinsawicki', name: 'http-request', version: '6.0'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
@@ -113,6 +112,11 @@ publishing{
             version = project.version
             project.shadow.component(publication)
         }
+    }
+}
+shadowJar{
+    manifest{
+        attributes "Type":"Shadow"
     }
 }
 def docLang=getLang()

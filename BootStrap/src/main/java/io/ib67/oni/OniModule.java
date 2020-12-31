@@ -3,26 +3,48 @@ package io.ib67.oni;
 import com.google.gson.Gson;
 import io.ib67.oni.internal.Loader;
 import io.ib67.oni.internal.OniSetting;
-import io.ib67.oni.maven.Result;
-import io.ib67.oni.maven.config.Dependency;
+import io.ib67.oni.internal.data.Dependency;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.jboss.shrinkwrap.resolver.impl.maven.logging.LogTransferListener;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Reader;
-import java.util.LinkedList;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
+import java.util.logging.Logger;
 
 /**
  * Oni plugin bootstrap entrance.
  */
+@SuppressWarnings("unused")
 public abstract class OniModule extends JavaPlugin {
     private static final Gson gson = new Gson();
     private Oni oniCore;
-    private MavenDownloader downloader;
+    private ConfigurableMavenResolverSystem downloader;
     private OniSetting oniSetting;
-    private List<Dependency> failedDeps = new LinkedList<>();
+    private static final List<String> DEFAULT_REPOSITORIES = Arrays.asList(
+            "https://repo.sfclub.cc/releases/",
+            "https://jitpack.io/",
+            "https://maven.aliyun.com/nexus/content/groups/public/",
+            "https://repo.maven.apache.org/maven2/",
+            "https://repo.sfclub.cc/snapshots/"
+    );
+    private static final List<String> MAVEN_RESOLVER_PROVIDERS = Arrays.asList(
+            "https://storage.sfclub.cc/resolver.jar"
+            //If you're willing to support us..
+            //E-Mail: icebear67@sfclub.cc
+    );
 
     @Override
     public final void onLoad() {
@@ -34,6 +56,11 @@ public abstract class OniModule extends JavaPlugin {
         onStop();
     }
 
+    /**
+     * get Oni.
+     *
+     * @return Oni
+     */
     protected final Oni getOni() {
         Validate.notNull(oniCore, "Oni is not loaded yet!");
         return oniCore;
@@ -44,36 +71,9 @@ public abstract class OniModule extends JavaPlugin {
         Reader textRes = getTextResource("oni.setting.json");
         Validate.notNull(textRes, "Broken plugin (Missing oni.setting.json)");
         oniSetting = gson.fromJson(textRes, OniSetting.class);
-        downloader = new MavenDownloader(oniSetting.additionalRepos);
-/*        try {
-            Class.forName("io.ib67.oni.Oni");
-            // Class found!
-            String[] versions = oniSetting.oniVersion.split("\\.");
-            if (versions.length < 2) {
-                getLogger().warning("Illegal oni version,Please contact plugin author.");
-                return;
-            }
-            if (Integer.parseInt(versions[0]) > Oni.VERSION) {
-                //Oni out of date.
-                if (!startInjection(true)) {
-                    getLogger().warning("Failed to load oni,plugin will not work.");
-                    setEnabled(false);
-                    return;
-                }
-            }
-        } catch (ClassNotFoundException ignored) {*/
-            // We're first!
+        initializeDownloader(false);
         if (!startInjection(true)) {
             getLogger().warning("Failed to load oni,plugin will not work.");
-            setEnabled(false);
-            return;
-        }
-        //}
-        //Resolve dependencies.
-        if (!resolveDependencies(oniSetting.dependencies)) {
-            getLogger().warning("Failed to solve dependencies,plugin will not work.");
-            getLogger().warning("Unable to resolve:");
-            failedDeps.forEach(d -> getLogger().warning(d.groupId + ":" + d.artifactId + ":" + d.version));
             setEnabled(false);
             return;
         }
@@ -81,49 +81,117 @@ public abstract class OniModule extends JavaPlugin {
     }
 
     /**
-     * DO you really know what are you doing?
+     * plugin.onLoad , previous than preEnable.
+     *
+     * @since 1.0
      */
     public void beforeEnable() {
     }
 
+    /**
+     * Executed before oniBootstrap actually runs.
+     *
+     * @since 3.0
+     */
+    public void preEnable() {
+    }
+
+    /**
+     * Executed when bootstrap finishes its work.
+     *
+     * @since 1.0
+     */
     public abstract void onStart();
 
+    /**
+     * Executed when server shutting down.
+     *
+     * @since 1.0
+     */
     public abstract void onStop();
 
-    private boolean resolveDependencies(List<Dependency> deps) {
-        List<Result> results = downloader.downloadAll(deps);
-        results.stream().filter(e -> !e.isSucceed).forEachOrdered(e -> failedDeps.add(e.dependency));
-        boolean succeed = results.stream().anyMatch(e -> !e.isSucceed && !e.dependency.optional);
-        if (!succeed) return false;
-        results.stream().filter(e -> e.isSucceed).forEachOrdered(e -> {
-            Loader.addPath(e.downloadResult, this.getClassLoader());
-        });
+    private boolean resolveAndLoadDependencies(List<Dependency> deps) {
+        for (Dependency dep : deps) {
+            try {
+                if (oniSetting.verbose) {
+                    getLogger().info("=> Resolving: " + dep.asCoordinate());
+                }
+                File[] resolved = downloader.resolve(dep.asCoordinate()).withTransitivity().asFile();
+                for (File file : resolved) {
+                    if (oniSetting.verbose) {
+                        getLogger().info("=> Resolved: " + file.getName() + " (" + file.getAbsolutePath() + ")");
+                    }
+                    ClassLoader cl = Bukkit.class.getClassLoader();
+                    if (dep.compatibilityMode) {
+                        cl = this.getClassLoader();
+                    }
+                    Loader.addPath(file, cl);
+                }
+
+            } catch (Exception e) {
+                getLogger().warning("Failed to download/load dependency: " + dep.asCoordinate());
+                if (dep.optional) {
+                    getLogger().warning("Some function may not work well. (" + e.getMessage() + ")");
+                } else {
+                    getLogger().warning("Plugin will not work. (" + e.getMessage() + ")");
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
-    private boolean startInjection(boolean capabilityMode) {
-        Dependency dep = new Dependency("Oni-all", "io.ib67.oni", oniSetting.oniVersion);
-        File file = MavenDownloader.dependencyToFile(dep);
-        if (!file.exists() || file.getTotalSpace() == 0) {
-            // Download oni first
-            Result result = downloader.downloadArtifact(dep);
-            if (!result.isSucceed) {
-                getLogger().warning("Failed to download Oni! Depended Oni version: " + dep.version);
-                getLogger().warning("Plugin will not work. Check for manual for help.");
-                return false;
-            }
+    private boolean startInjection(boolean compatibilityMode) {
+        Dependency oni = new Dependency("io.ib67.oni", "Oni-all", oniSetting.oniVersion, "jar", "all", false);
+        oni.compatibilityMode = compatibilityMode;
+        List<Dependency> depsToLoad = new ArrayList<>();
+        depsToLoad.add(oni);
+        depsToLoad.addAll(oniSetting.dependencies);
+        if (!resolveAndLoadDependencies(depsToLoad)) {
+            return false;
         }
-        // download succeed or exists
-        ClassLoader cl = Bukkit.class.getClassLoader();
-        if (capabilityMode) {
-            cl = this.getClassLoader();
-        }
-        Loader.addPath(file, cl);
-        if (Loader.forName("io.ib67.oni.Oni", true, cl) == null) {
+        if (Loader.forName("io.ib67.oni.Oni", true, compatibilityMode ? this.getClassLoader() : Bukkit.class.getClassLoader()) == null) {
             return false;
         }
         this.oniCore = Oni.of(this);
         return true;
     }
 
+    private boolean initializeDownloader(boolean tried) {
+        try {
+            Class.forName("org.jboss.shrinkwrap.resolver.api.maven.Maven");
+            oniSetting.additionalRepos.addAll(DEFAULT_REPOSITORIES);
+            downloader = Maven.configureResolver();
+            oniSetting.additionalRepos.forEach(r -> {
+                downloader = downloader.withRemoteRepo(UUID.randomUUID().toString(), r, "default");
+            });
+            Logger.getLogger(LogTransferListener.class.getName()).setFilter(msg -> !msg.getMessage().contains("Failed downloading"));
+            return true; // Already loaded
+        } catch (ClassNotFoundException ignored) {
+            //oof
+        }
+        if (tried) {
+            return false;
+        }
+        for (String u : MAVEN_RESOLVER_PROVIDERS) {
+            try {
+                Loader.addPath(downloadUsingNIO(u, "./libs/MavenResolver.jar"), Bukkit.class.getClassLoader()); // Load to global
+                return initializeDownloader(true);
+            } catch (IOException e) {
+                getLogger().warning("Failed to download downloader when using provider " + u);
+                getLogger().warning("Trying next..");
+            }
+        }
+        return false;
+    }
+
+    private File downloadUsingNIO(String urlStr, String file) throws IOException {
+        URL url = new URL(urlStr);
+        ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+        FileOutputStream fos = new FileOutputStream(file);
+        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+        fos.close();
+        rbc.close();
+        return new File(file);
+    }
 }

@@ -35,8 +35,6 @@ repositories {
 }
 dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
-    compile 'io.ib67.oni:Oni-all:1.0-M1-dev-1'
 }
 
 processResources {
