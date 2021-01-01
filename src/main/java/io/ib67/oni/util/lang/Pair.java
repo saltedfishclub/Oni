@@ -1,5 +1,11 @@
 package io.ib67.oni.util.lang;
 
+/**
+ * Bundle object.
+ * Also see: {@link Quadruple} {@link Triple}
+ *
+ * @since 1.0
+ */
 public class Pair<K, V> {
     public K key;
     public V value;

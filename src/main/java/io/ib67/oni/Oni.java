@@ -42,7 +42,7 @@ public class Oni {
 
     static {
         Injector.INSTANCE.addFieldHandler(OniInject.class, p -> { //Inject Spreader
-            Object o = ReflectUtil.getField(p.value, p.key);
+            Object o = ReflectUtil.getField(p.B, p.A);
             if (o == null) {
                 return;
             }
