@@ -1,4 +1,4 @@
-- [Getting Started](GettingStarted.md)
-- [Contribute](Contribute.md)
-- [Tutorial](Tutorial.md)
-- [Other Libraries](OtherLibraries.md)
+- [开始](GettingStarted.md)
+- [贡献](Contribute.md)
+- [教程](Tutorial.md)
+- [其他](OtherLibraries.md)

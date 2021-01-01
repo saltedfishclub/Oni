@@ -1,6 +1,5 @@
-Oni was spilt into many modules.  
-Starter should start from `basic`
+Oni由许多模块组成，初学者应从`基础`开始
 
-## Basic
+## 基础
 
-- [The Onions](basic/TheOnion)
+- [那些 Onions](basic/TheOnion)

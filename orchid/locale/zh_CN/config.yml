@@ -19,20 +19,20 @@ theme:
       title: 'Wiki'
     - type: 'wiki'
     - type: 'separator'
-      title: 'API Docs'
+      title: 'API 文档'
     - type: 'page'
       itemId: 'hello'
     - type: 'sourcedocPages'
       moduleType: 'javadoc'
       node: 'classes'
       asSubmenu: true
-      submenuTitle: 'Classes'
+      submenuTitle: '所有类'
 
     - type: 'sourcedocPages'
       moduleType: 'javadoc'
       node: 'packages'
       asSubmenu: true
-      submenuTitle: 'Packages'
+      submenuTitle: '所有包'
 indices:
   includeFrom:
     - 'wiki'
