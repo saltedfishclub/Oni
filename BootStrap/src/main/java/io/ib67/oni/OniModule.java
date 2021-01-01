@@ -95,6 +95,8 @@ public abstract class OniModule extends JavaPlugin {
 
     /**
      * Executed before oniBootstrap actually runs.
+     * **MENTION** getOni == null !!
+     * Only use it for Dependency Inject preparation.
      *
      * @since 3.0
      */
@@ -162,6 +164,7 @@ public abstract class OniModule extends JavaPlugin {
         if (Loader.forName("io.ib67.oni.Oni", true, compatibilityMode ? this.getClassLoader() : Bukkit.class.getClassLoader()) == null) {
             return false;
         }
+        preEnable(); // Provide a space to use DI.
         this.oniCore = Oni.of(this);
         return true;
     }
