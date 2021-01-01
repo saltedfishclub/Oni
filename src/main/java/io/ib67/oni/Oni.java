@@ -1,8 +1,10 @@
 package io.ib67.oni;
 
+import io.ib67.oni.inject.Injector;
+import io.ib67.oni.inject.OniInject;
 import io.ib67.oni.onion.ItemOnion;
 import io.ib67.oni.onion.PlayerOnion;
-import io.ib67.oni.util.annotation.LowLevelAPI;
+import io.ib67.oni.util.lang.ReflectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.Validate;
@@ -38,10 +40,22 @@ public class Oni {
     private static final Logger globalLogger = Logger.getLogger("Oni");
     private final Logger logger;
 
+    static {
+        Injector.INSTANCE.addFieldHandler(OniInject.class, p -> { //Inject Spreader
+            Object o = ReflectUtil.getField(p.value, p.key);
+            if (o == null) {
+                return;
+            }
+            Injector.INSTANCE.process(o);
+        });
+
+    }
+
     private Oni(JavaPlugin plugin) {
         this.plugin = plugin;
         logger = Logger.getLogger(plugin.getName());
         messagePrefix = String.format(DEFAULT_MESSAGE_PREFIX, plugin.getName());
+
     }
 
     /**
@@ -51,7 +65,6 @@ public class Oni {
      * @return Oni Instance
      * @since 1.0
      */
-    @LowLevelAPI
     public static Oni of(JavaPlugin plugin) {
         Validate.notNull(plugin, "Plugin cannot be null");
         if (claimedOni.containsKey(plugin.getName())) {
@@ -59,6 +72,11 @@ public class Oni {
         }
         claimedOni.put(plugin.getName(), new Oni(plugin));
         return claimedOni.get(plugin.getName());
+    }
+
+    private static void initPlugin(JavaPlugin plugin) {
+
+        Injector.INSTANCE.process(plugin);
     }
 
     /**
@@ -90,7 +108,7 @@ public class Oni {
      * @return onion
      * @since 1.0
      */
-    public Optional<PlayerOnion> onionOf(String player) {
+    public Optional<PlayerOnion> playerOnionOf(String player) {
         return PlayerOnion.of(player, this);
     }
 

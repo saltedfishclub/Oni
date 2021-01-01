@@ -10,7 +10,7 @@ public class PlayerExamples implements Listener {
     private Logger logger;
 
     public void testPermission() {
-        oni.onionOf("playerName").ifPresent(po -> { //PlayerOnion
+        oni.playerOnionOf("playerName").ifPresent(po -> { //PlayerOnion
             po.oni.addTempPermission("foo.bar");
             po.oni.addTempPermission("foo.bar"); // twice
             po.performCommand("xx"); // have permission todo
