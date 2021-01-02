@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Target(ElementType.ANNOTATION_TYPE)
+@Target(ElementType.FIELD)
 public @interface OniInject {
 
 }
