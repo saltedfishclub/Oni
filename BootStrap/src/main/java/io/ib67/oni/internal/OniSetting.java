@@ -6,7 +6,7 @@ import java.util.List;
 
 public class OniSetting {
     public boolean verbose;
-    public String oniVersion;
+    public List<String> checkerList;
     public List<Dependency> dependencies;
     public List<String> additionalRepos;
 }

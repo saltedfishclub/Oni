@@ -1,8 +1,8 @@
 package io.ib67.oni.testcase;
 
-import io.ib67.oni.OniModule;
+import io.ib67.oni.BootstrappedPlugin;
 
-public final class TestCase extends OniModule {
+public final class TestCase extends BootstrappedPlugin {
 
     /**
      * Executed before oniBootstrap actually runs.
@@ -22,7 +22,6 @@ public final class TestCase extends OniModule {
     @Override
     public void onStart() {
         getLogger().info("Started!");
-        getLogger().info(getOni().toString());
     }
 
     @Override
