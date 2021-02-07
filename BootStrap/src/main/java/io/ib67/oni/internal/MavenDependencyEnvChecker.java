@@ -7,6 +7,7 @@ import io.ib67.oni.bootstrap.LaunchState;
 import io.ib67.oni.bootstrap.PreparingContext;
 import io.ib67.oni.internal.data.Dependency;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.impl.maven.logging.LogTransferListener;
@@ -39,19 +40,23 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
             "https://maven.aliyun.com/nexus/content/groups/public/",
             "https://jitpack.io/",
             "https://repo.maven.apache.org/maven2/"
-    ); //todo use global config.
+    );
+    private List<String> defaultRepos;
     private static final List<String> MAVEN_RESOLVER_PROVIDERS = Arrays.asList(
             "https://storage.sfclub.cc/resolver.jar",
             "https://pro-video.xiaoheiban.cn/shi/aa8a21f2-2547-43c2-a92f-6845e4b2f16f.jar"
             //If you're willing to support us..
             //E-Mail: icebear67@sfclub.cc
     );
+    private List<String> resolverProviders;
 
     @Override
     public void apply(PreparingContext ctx) {
         this.oniSetting = ctx.getSettings();
         this.logger = ctx.getModule().getLogger();
         this.module = ctx.getModule();
+        defaultRepos = loadGlobalDefaultRepos();
+        resolverProviders = loadGlobalResolverProviders();
         if (oniSetting.verbose) {
             logger.info("[Verbose] Initilizing Downloader");
         }
@@ -67,6 +72,27 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
             logger.warning("Failed to load dependencies,plugin will not work.");
             ctx.setState(LaunchState.FAIL);
         }
+    }
+
+    private List<String> loadGlobalDefaultRepos() {
+        File config = new File("./plugins/Oni/dependency-solver.yml");
+        if (!config.exists()) {
+            return DEFAULT_REPOSITORIES;
+        } else {
+            List<String> urls = YamlConfiguration.loadConfiguration(config).getStringList("repositories");
+            return urls.isEmpty() ? DEFAULT_REPOSITORIES : urls; //todo add document
+        }
+    }
+
+    private List<String> loadGlobalResolverProviders() {
+        File config = new File("./plugins/Oni/dependency-solver.yml");
+        if (!config.exists()) {
+            return MAVEN_RESOLVER_PROVIDERS;
+        } else {
+            List<String> urls = YamlConfiguration.loadConfiguration(config).getStringList("providers");
+            return urls.isEmpty() ? DEFAULT_REPOSITORIES : urls; //todo add document
+        }
+
     }
 
     private boolean resolveAndLoadDependencies(List<Dependency> deps) {
@@ -132,7 +158,7 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
             if (oniSetting.additionalRepos == null) {
                 oniSetting.additionalRepos = new ArrayList<>();
             }
-            oniSetting.additionalRepos.addAll(DEFAULT_REPOSITORIES);
+            oniSetting.additionalRepos.addAll(defaultRepos);
             downloader = Maven.configureResolver();
             int counter = 0;
             for (String r : oniSetting.additionalRepos) {
@@ -152,7 +178,7 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
             Loader.addPath(file, Bukkit.class.getClassLoader());
             return initializeDownloader(true);
         }
-        for (String u : MAVEN_RESOLVER_PROVIDERS) {
+        for (String u : resolverProviders) {
             try {
                 File f = downloadUsingNIO(u, "./libs/MavenResolver.jar");
                 if (getFileMD5(f).toLowerCase().equals(MAVEN_RESOLVER_MD5)) {
