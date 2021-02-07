@@ -1,5 +1,6 @@
 package io.ib67.oni;
 
+import io.ib67.oni.inject.EventListener;
 import io.ib67.oni.inject.Injector;
 import io.ib67.oni.inject.OniInject;
 import io.ib67.oni.onion.ItemOnion;
@@ -8,8 +9,10 @@ import io.ib67.oni.util.lang.ReflectUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,9 +51,23 @@ public class Oni {
             }
             Injector.INSTANCE.process(o);
         });
+        Injector.INSTANCE.addFieldHandler(EventListener.class, p -> {
+            Object obj = ReflectUtil.getField(p.B, p.A);
+            if (obj != null && p.A instanceof JavaPlugin && obj instanceof Listener) {
+                Bukkit.getPluginManager().registerEvents((Listener) obj, (JavaPlugin) p.A);
+            }
+            if (obj == null && ((EventListener) p.C).autoInitial() && p.A instanceof JavaPlugin) {
+                try {
+                    ReflectUtil.setField(p.B, p.A, p.B.getType().newInstance());
+                } catch (IllegalAccessException | InstantiationException e) {
+                    e.printStackTrace();
+                    ((JavaPlugin) p.A).getLogger().warning("Cannot init EventListener for field " + p.B.getName() + ".");
+                    ReflectUtil.invokeMethod(ReflectUtil.methodOf(p.A.getClass(), "setEnabled", boolean.class), p.A, false);
+                }
+            }
+        });
 
     }
-
     private Oni(JavaPlugin plugin) {
         this.plugin = plugin;
         logger = Logger.getLogger(plugin.getName());

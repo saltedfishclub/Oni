@@ -10,7 +10,7 @@ plugins {
 group 'io.ib67.oni'
 version "1.0-M1-dev-1"
 targetCompatibility=1.8
-sourceCompatibility=1.8
+sourceCompatibility = 1.8
 repositories {
     mavenCentral()
     jcenter()
@@ -101,6 +101,7 @@ dependencies {
     orchidRuntime("io.github.javaeden.orchid:OrchidWiki:0.21.0")
     orchidRuntime "io.github.javaeden.orchid:OrchidJavadoc:0.21.0"
     orchidRuntime("io.github.javaeden.orchid:OrchidPluginDocs:0.21.0")
+    compile 'com.jayway.jsonpath:json-path:2.5.0'
 }
 processResources {
     from(sourceSets.main.resources.srcDirs) {

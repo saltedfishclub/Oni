@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class ReflectUtil {
@@ -28,6 +29,17 @@ public class ReflectUtil {
     public static Object getField(@NonNull Field field, Object object) {
         field.setAccessible(true);
         return field.get(object);
+    }
+
+    @SneakyThrows
+    public static Object invokeMethod(@NonNull Method method, Object object, Object... params) {
+        method.setAccessible(true);
+        return method.invoke(object, params);
+    }
+
+    @SneakyThrows
+    public static Method methodOf(Class<?> target, String name, Class<?>... params) {
+        return target.getMethod(name, params);
     }
 
     public static boolean containsAnnotation(List<Annotation> annotations, Class<? extends Annotation> annotation) {
