@@ -7,7 +7,7 @@ public class Dependency {
     public final String artifactId;
     public final String version;
     public String classifier;
-    public String packagingType = "jar";
+    public String packagingType = "";
 
     public Dependency(String groupId, String artifactId, String version, boolean optional) {
         this.groupId = groupId;

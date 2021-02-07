@@ -12,15 +12,19 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.impl.maven.logging.LogTransferListener;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 public class MavenDependencyEnvChecker implements IEnvChecker {
@@ -28,6 +32,7 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
     private Logger logger;
     private OniSetting oniSetting;
     private BootstrappedPlugin module;
+    private static final String MAVEN_RESOLVER_MD5 = "bca3b49fe5eab6b59e78d844d58a89a1";
     private static final List<String> DEFAULT_REPOSITORIES = Arrays.asList(
             "https://repo.sfclub.cc/releases/",
             "https://repo.sfclub.cc/snapshots/",
@@ -47,13 +52,19 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
         this.oniSetting = ctx.getSettings();
         this.logger = ctx.getModule().getLogger();
         this.module = ctx.getModule();
+        if (oniSetting.verbose) {
+            logger.info("[Verbose] Initilizing Downloader");
+        }
         if (!initializeDownloader(false)) {
             ctx.setState(LaunchState.FAIL);
-            logger.warning("Failed to download Resolver,Please check Oni Document for help.");
+            logger.warning("Failed to download/verify Resolver,Please check Oni Document for help.");
             return;
         }
+        if (oniSetting.verbose) {
+            logger.info("[Verbose] Starting injection");
+        }
         if (!startInjection(true)) {
-            logger.warning("Failed to load oni,plugin will not work.");
+            logger.warning("Failed to load dependencies,plugin will not work.");
             ctx.setState(LaunchState.FAIL);
         }
     }
@@ -109,6 +120,7 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
         return true;
     }
 
+    @Override
     public LaunchStage getLaunchStage() {
         return LaunchStage.PRE_ENABLE;
     }
@@ -122,9 +134,10 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
             }
             oniSetting.additionalRepos.addAll(DEFAULT_REPOSITORIES);
             downloader = Maven.configureResolver();
-            oniSetting.additionalRepos.forEach(r -> {
-                downloader.withRemoteRepo(UUID.randomUUID().toString(), r, "default");
-            });
+            int counter = 0;
+            for (String r : oniSetting.additionalRepos) {
+                downloader.withRemoteRepo(String.valueOf(++counter), r, "default");
+            }
             Logger.getLogger(LogTransferListener.class.getName()).setFilter(msg -> !msg.getMessage().contains("Failed downloading") && !msg.getMessage().contains("not found"));
             return true; // Already loaded
         } catch (ClassNotFoundException ignored) {
@@ -134,18 +147,28 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
             return false;
         }
         File file = new File("./libs/MavenResolver.jar");
-        if (file.exists()) {
+
+        if (file.exists() && getFileMD5(file).toLowerCase().equals(MAVEN_RESOLVER_MD5)) {
             Loader.addPath(file, Bukkit.class.getClassLoader());
             return initializeDownloader(true);
         }
         for (String u : MAVEN_RESOLVER_PROVIDERS) {
             try {
-                Loader.addPath(downloadUsingNIO(u, "./libs/MavenResolver.jar"), Bukkit.class.getClassLoader()); // Load to global
-                return initializeDownloader(true);
+                File f = downloadUsingNIO(u, "./libs/MavenResolver.jar");
+                if (getFileMD5(f).toLowerCase().equals(MAVEN_RESOLVER_MD5)) {
+                    Loader.addPath(file, Bukkit.class.getClassLoader());
+                    return initializeDownloader(true);
+                }
             } catch (IOException e) {
                 if (oniSetting.verbose) e.printStackTrace();
                 logger.warning("Failed to download downloader when using provider " + u);
                 logger.warning("Trying next..");
+                if (new File("./libs/MavenResolver.jar").exists()) {
+                    try {
+                        Files.delete(Paths.get("./libs/MavenResolver.jar"));
+                    } catch (Throwable ignored) {
+                    }
+                }
             }
         }
         return false;
@@ -159,5 +182,28 @@ public class MavenDependencyEnvChecker implements IEnvChecker {
         fos.close();
         rbc.close();
         return new File(file);
+    }
+
+    public static String getFileMD5(File file) {
+        if (!file.isFile()) {
+            return null;
+        }
+        MessageDigest digest = null;
+        FileInputStream in = null;
+        byte buffer[] = new byte[1024];
+        int len;
+        try {
+            digest = MessageDigest.getInstance("MD5");
+            in = new FileInputStream(file);
+            while ((len = in.read(buffer, 0, 1024)) != -1) {
+                digest.update(buffer, 0, len);
+            }
+            in.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        return bigInt.toString(16);
     }
 }

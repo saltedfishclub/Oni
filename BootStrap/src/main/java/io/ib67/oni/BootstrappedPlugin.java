@@ -50,12 +50,15 @@ public abstract class BootstrappedPlugin extends JavaPlugin {
 //todo load checkers
         List<IEnvChecker> checkerList = new ArrayList<>();
         for (String s : oniSetting.checkerList) {
+            getLogger().info("[VERBOSE] Loading... " + s);
             try {
                 Class<?> clazz = Class.forName(s);
-                if (clazz.isAssignableFrom(IEnvChecker.class)) {
-                    checkerList.add((IEnvChecker) clazz.getDeclaredConstructor().newInstance());
 
+                checkerList.add((IEnvChecker) clazz.getDeclaredConstructor().newInstance());
+                if (oniSetting.verbose) {
+                    getLogger().info("[VERBOSE] Loaded...");
                 }
+
             } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
                 ex.printStackTrace();
                 getLogger().warning("Couldn't load checker " + s);
@@ -87,6 +90,7 @@ public abstract class BootstrappedPlugin extends JavaPlugin {
                 return;
             }
         }
+
         preEnable();
         for (IEnvChecker preEnableChecker : enableCheckers) {
             preEnableChecker.apply(ctx);
