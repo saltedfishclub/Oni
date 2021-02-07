@@ -1,16 +1,14 @@
 package io.ib67.oni.onion;
 
-import io.ib67.oni.ConstPrefix;
 import io.ib67.oni.Oni;
 import io.ib67.oni.internal.mock.OniPlayer;
 import io.ib67.oni.util.annotation.LowLevelAPI;
+import io.ib67.oni.util.lang.ArrayUtil;
 import io.ib67.oni.util.text.TextUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.*;
@@ -81,11 +79,13 @@ public final class PlayerOnion extends OniPlayer {
 
         /**
          * Add temp permission
+         * use `performCommandWithPermission` instead.
          *
          * @param permission perm
          * @return false if player already has this temp-permission.
          * @since 1.0
          */
+        @Deprecated
         public Accessor addTempPermission(String permission) {
             Validate.notNull(permission, "Permission cannot be null");
             onion.tempPermissions.add(permission);
@@ -93,68 +93,37 @@ public final class PlayerOnion extends OniPlayer {
         }
 
         /**
+         * Perform commands with some permissions.
+         * **Mention** Excess permissions nodes will be retained on an ongoing basis
+         *
+         * @param command
+         * @param permissions
+         * @return
+         */
+        public Accessor performCommandWithPermission(String command, String... permissions) {
+            Validate.notNull(command);
+            if (ArrayUtil.isEmptyOrNull(permissions)) {
+                throw new NullPointerException("permissions cannot be null");
+            }
+            for (String permission : permissions) {
+                addTempPermission(permission);
+            }
+            onion.performCommand(command);
+            return this;
+        }
+
+        /**
          * Send a message with color
-         * @since 1.0
+         *
          * @param message message
          * @return accessor
+         * @since 1.0
          */
         public Accessor sendMessage(String message) {
             Validate.notNull(message, "Message cannot be null");
             onion.sendMessage(TextUtil.translateColorChars(message));
             return this;
         }
-
-        /**
-         * Send message with prefix
-         * @since 1.0
-         * @param message message
-         * @return this
-         */
-        public Accessor info(String message) {
-            Validate.notNull(message, "Message cannot be null");
-            sendMessage(onion.oniCore.getMessagePrefix() + message);
-            return this;
-        }
-
-        /**
-         * Warn a player
-         * @since 1.0
-         * @param message msg
-         * @return accessor
-         */
-        public Accessor warn(String message) {
-            Validate.notNull(message, "Message cannot be null");
-            sendMessage(ConstPrefix.WARN + message);
-            return this;
-        }
-
-        /**
-         * send fatal error message
-         * @since 1.0
-         * @param message msg
-         * @return this
-         */
-        public Accessor fatal(String message) {
-            Validate.notNull(message, "Message cannot be null");
-            sendMessage(ConstPrefix.FATAL + message);
-            Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + "( FATAL ) " + message + " onion: " + onion.toString());
-            onion.playSound(onion.getLocation(), Sound.BLOCK_ANVIL_DESTROY, 5f, 3f);
-            return this;
-        }
-
-        /**
-         * Remind a player to do sth
-         * @since 1.0
-         * @param message msg
-         * @return this
-         */
-        public Accessor tip(String message) {
-            Validate.notNull(message, "Message cannot be null");
-            sendMessage(ConstPrefix.TIP + message);
-            onion.playSound(onion.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 2f, 1f);
-            return this;
-        }
-
         /**
          * Send action bar message
          * @since 1.0
