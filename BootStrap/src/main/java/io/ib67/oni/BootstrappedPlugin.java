@@ -47,7 +47,6 @@ public abstract class BootstrappedPlugin extends JavaPlugin {
         Reader textRes = getTextResource("oni.setting.json");
         Validate.notNull(textRes, "Broken plugin (Missing oni.setting.json)");
         oniSetting = gson.fromJson(textRes, OniSetting.class);
-//todo load checkers
         List<IEnvChecker> checkerList = new ArrayList<>();
         for (String s : oniSetting.checkerList) {
             getLogger().info("[VERBOSE] Loading... " + s);

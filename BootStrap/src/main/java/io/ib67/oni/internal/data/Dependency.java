@@ -17,7 +17,6 @@ public class Dependency {
     }
 
     public Dependency(String groupId, String artifactId, String version, String classifier, String packagingType, boolean optional) {
-        //TODO Update Oni.Linker for classifier and packagingType support.
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
